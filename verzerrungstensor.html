@@ -25,6 +25,10 @@ td{padding:.3rem .8rem;text-align:right;border-left:2px solid #333;border-right:
 <label>ε<sub>yz</sub><input type="number" step="any" id="eyz" value="0"></label>
 <label>ε<sub>xz</sub><input type="number" step="any" id="exz" value="0"></label>
 </div>
+<h2>Darstellung</h2>
+<canvas id="cv" width="400" height="300"></canvas>
+<p><label>Überhöhung: <b id="kv"></b>×<input type="range" id="k" min="1" max="20" value="5" style="width:100%"></label></p>
+<p style="font-size:.85rem">Grau: unverformter Würfel, blau: verformter Würfel (u = ε·x, Dehnungen überhöht dargestellt).</p>
 <h2>Tensor</h2>
 <table id="matrix"></table>
 <p>Volumendehnung (Spur): <b id="trace"></b></p>
@@ -38,7 +42,26 @@ function update(){
   document.getElementById("trace").textContent=xx+yy+zz;
 }
 ids.forEach(id=>document.getElementById(id).addEventListener("input",update));
-update();
+const cv=document.getElementById("cv"),ctx=cv.getContext("2d"),ks=document.getElementById("k");
+const P=[[0,0,0],[1,0,0],[1,1,0],[0,1,0],[0,0,1],[1,0,1],[1,1,1],[0,1,1]];
+const E=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+function proj(p){return [200+(p[0]-.5)*120+(p[2]-.5)*50,150-(p[1]-.5)*120-(p[2]-.5)*50];}
+function drawCube(pts,col,w){
+  ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();
+  E.forEach(([a,b])=>{const A=proj(pts[a]),B=proj(pts[b]);ctx.moveTo(A[0],A[1]);ctx.lineTo(B[0],B[1]);});
+  ctx.stroke();
+}
+function drawImg(){
+  const [xx,yy,zz,xy,yz,xz]=ids.map(g),k=+ks.value;
+  document.getElementById("kv").textContent=k;
+  const m=[[xx,xy,xz],[xy,yy,yz],[xz,yz,zz]];
+  const q=P.map(p=>p.map((c,i)=>c+k*(m[i][0]*(p[0]-.5)+m[i][1]*(p[1]-.5)+m[i][2]*(p[2]-.5))));
+  ctx.clearRect(0,0,400,300);
+  drawCube(P,"#aaa",1);drawCube(q,"#1e78dc",2);
+}
+ks.addEventListener("input",drawImg);
+ids.forEach(id=>document.getElementById(id).addEventListener("input",drawImg));
+update();drawImg();
 </script>
 </body>
 </html>
