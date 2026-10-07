@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jakobi-Matrix</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:700px;margin:2rem auto;padding:0 1rem}
+canvas{border:1px solid #ccc;max-width:100%}
+input[type=range]{width:100%}
+table{border-collapse:collapse;font-size:1.1rem}
+td{padding:.3rem .8rem;text-align:right;border-left:2px solid #333;border-right:2px solid #333}
+</style>
+</head>
+<body>
+<p><a href="index.html">&larr; Startseite</a></p>
+<h1>Jakobi-Matrix (Polarkoordinaten)</h1>
+<p>x = r·cos φ, y = r·sin φ. Der Schieberegler verändert den Radius r des Kreisrings (Dicke Δr = 0,5).</p>
+<canvas id="c" width="500" height="500"></canvas>
+<label>Radius r = <b id="rv"></b>
+<input type="range" id="r" min="0.5" max="10" step="0.1" value="4"></label>
+<h2>Jakobi-Matrix bei φ = 45°</h2>
+<table id="matrix"></table>
+<p>det J = r = <b id="det"></b> &nbsp;|&nbsp; Fläche des Rings ≈ 2π·r·Δr = <b id="area"></b></p>
+<script>
+const cv=document.getElementById("c"),ctx=cv.getContext("2d"),s=document.getElementById("r");
+const dr=0.5,scale=22,phi=Math.PI/4;
+function draw(){
+  const r=parseFloat(s.value),cx=250,cy=250;
+  ctx.clearRect(0,0,500,500);
+  ctx.strokeStyle="#ddd";ctx.beginPath();
+  ctx.moveTo(0,cy);ctx.lineTo(500,cy);ctx.moveTo(cx,0);ctx.lineTo(cx,500);ctx.stroke();
+  ctx.fillStyle="rgba(30,120,220,.5)";ctx.strokeStyle="#1e78dc";
+  ctx.beginPath();
+  ctx.arc(cx,cy,(r+dr)*scale,0,2*Math.PI);
+  ctx.arc(cx,cy,r*scale,0,2*Math.PI,true);
+  ctx.fill("evenodd");ctx.stroke();
+  const px=cx+r*scale*Math.cos(phi),py=cy-r*scale*Math.sin(phi);
+  ctx.strokeStyle="#d22";ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(px,py);ctx.stroke();ctx.lineWidth=1;
+  ctx.fillStyle="#d22";ctx.beginPath();ctx.arc(px,py,4,0,2*Math.PI);ctx.fill();
+  const f=v=>v.toFixed(3),c=Math.cos(phi),sn=Math.sin(phi);
+  document.getElementById("matrix").innerHTML=
+    "<tr><td>"+f(c)+"</td><td>"+f(-r*sn)+"</td></tr><tr><td>"+f(sn)+"</td><td>"+f(r*c)+"</td></tr>";
+  document.getElementById("rv").textContent=r.toFixed(1);
+  document.getElementById("det").textContent=r.toFixed(1);
+  document.getElementById("area").textContent=(2*Math.PI*r*dr).toFixed(2);
+}
+s.addEventListener("input",draw);draw();
+</script>
+</body>
+</html>
