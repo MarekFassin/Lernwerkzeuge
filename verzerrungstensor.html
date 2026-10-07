@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verzerrungstensor</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:700px;margin:2rem auto;padding:0 1rem}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin:1rem 0}
+label{display:flex;flex-direction:column;font-size:.9rem}
+input{padding:.4rem;font-size:1rem}
+table{border-collapse:collapse;font-size:1.1rem}
+td{padding:.3rem .8rem;text-align:right;border-left:2px solid #333;border-right:2px solid #333}
+</style>
+</head>
+<body>
+<p><a href="index.html">&larr; Startseite</a></p>
+<h1>Verzerrungstensor (3D)</h1>
+<p>Der Verzerrungstensor ist symmetrisch, daher genügen 6 unabhängige Komponenten.</p>
+<div class="grid">
+<label>ε<sub>xx</sub><input type="number" step="any" id="exx" value="0"></label>
+<label>ε<sub>yy</sub><input type="number" step="any" id="eyy" value="0"></label>
+<label>ε<sub>zz</sub><input type="number" step="any" id="ezz" value="0"></label>
+<label>ε<sub>xy</sub><input type="number" step="any" id="exy" value="0"></label>
+<label>ε<sub>yz</sub><input type="number" step="any" id="eyz" value="0"></label>
+<label>ε<sub>xz</sub><input type="number" step="any" id="exz" value="0"></label>
+</div>
+<h2>Tensor</h2>
+<table id="matrix"></table>
+<p>Volumendehnung (Spur): <b id="trace"></b></p>
+<script>
+const ids=["exx","eyy","ezz","exy","eyz","exz"];
+const g=id=>parseFloat(document.getElementById(id).value)||0;
+function update(){
+  const [xx,yy,zz,xy,yz,xz]=ids.map(g);
+  const m=[[xx,xy,xz],[xy,yy,yz],[xz,yz,zz]];
+  document.getElementById("matrix").innerHTML=m.map(r=>"<tr>"+r.map(v=>"<td>"+v+"</td>").join("")+"</tr>").join("");
+  document.getElementById("trace").textContent=xx+yy+zz;
+}
+ids.forEach(id=>document.getElementById(id).addEventListener("input",update));
+update();
+</script>
+</body>
+</html>
